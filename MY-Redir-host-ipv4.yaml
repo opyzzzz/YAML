@@ -1,0 +1,261 @@
+mixed-port: 7890
+allow-lan: false
+bind-address: "*"
+mode: rule
+log-level: warning
+ipv6: false
+unified-delay: true
+tcp-concurrent: true
+find-process-mode: strict
+sniffer:
+  enable: true
+  override-destination: true
+  parse-pure-ip: true
+  force-dns-mapping: true
+  sniff:
+    QUIC:
+      ports: [443]
+    TLS:
+      ports: [443, 8443]
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+  force-domain:
+    - "+.netflix.com"
+    - "+.nflxvideo.net"
+    - "+.amazonaws.com"
+    - "+.media.dssott.com"
+  skip-domain:
+    - "+.apple.com"
+    - Mijia Cloud
+    - dlg.io.mi.com
+    - "+.oray.com"
+    - "+.sunlogin.net"
+    - "+.push.apple.com"
+dns:
+  enable: true
+  listen: "127.0.0.1:1053"
+  ipv6: false
+  enhanced-mode: "redir-host"
+  fake-ip-filter-mode: blacklist
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - "*.lan"
+    - "*.localdomain"
+    - "*.example"
+    - "*.invalid"
+    - "*.localhost"
+    - "*.test"
+    - "*.local"
+    - "*.home.arpa"
+    - "geosite:private"
+    - "geosite:category-ntp"
+    - "geosite:cn"
+  use-hosts: true
+  use-system-hosts: true
+  default-nameserver:
+    - https://8.8.8.8/dns-query
+    - https://1.1.1.1/dns-query
+  nameserver:
+    - https://dns.google/dns-query
+    - https://dns.cloudflare.com/dns-query
+  proxy-server-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  direct-nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  respect-rules: true
+hosts:
+  dns.alidns.com: [223.5.5.5, 223.6.6.6, 2400:3200::1, 2400:3200:baba::1]
+  doh.pub: [1.12.12.12, 1.12.12.21, 120.53.53.53]
+  dns.google: [8.8.8.8, 8.8.4.4, 2001:4860:4860::8888, 2001:4860:4860::8844]
+  cloudflare-dns.com: [1.1.1.1, 1.0.0.1, 2606:4700:4700::1111, 2606:4700:4700::1001]
+
+# 策略组逻辑
+proxy-groups:
+  # === 1. 全局核心组 ===
+  - name: "🚀 一键代理"
+    type: select
+    proxies:
+      - "🎉 自建手动"
+      - "🛸 游戏手动"
+      - "❤️ 良心云手动"
+      - "🍉 下载手动"
+      - "🇭🇰 香港手动"
+      - "🇯🇵 日本手动"
+      - "🇸🇬 新加坡手动"
+      - "🇺🇸 美国手动"
+      - "🇪🇺 欧洲手动"
+      - "🌐 其他手动"
+      - "DIRECT"
+      - "REJECT"
+
+  # 自建类
+  - name: "🎉 自建手动"
+    type: select
+    include-all: true
+    filter: '(?i)233boy|0xda|fscarmen|suoha|argo'
+
+  # 商店类
+  - name: "💡 商店"
+    type: select
+    proxies: ["DIRECT", "REJECT", "🚀 一键代理", "🎉 自建手动", "🛸 游戏手动", "🍉 下载手动", "❤️ 良心云手动", "🇭🇰 香港手动", "🇯🇵 日本手动", "🇸🇬 新加坡手动", "🇺🇸 美国手动", "🇪🇺 欧洲手动", "🌐 其他手动"]
+ 
+  # 游戏类
+  - name: "🛸 游戏"
+    type: select
+    proxies: ["DIRECT", "REJECT", "🚀 一键代理", "🎉 自建手动", "🛸 游戏手动", "🍉 下载手动", "❤️ 良心云手动", "🇭🇰 香港手动", "🇯🇵 日本手动", "🇸🇬 新加坡手动", "🇺🇸 美国手动", "🇪🇺 欧洲手动", "🌐 其他手动"]
+  - name: "🛸 游戏手动"
+    type: select
+    include-all: true
+    filter: '(?i)IPLC|IEPL|游戏|Game|2x'
+
+  # 下载类
+  - name: "🍉 下载"
+    type: select
+    proxies: ["🍉 下载手动", "❤️ 良心云手动", "🚀 一键代理", "🇭🇰 香港手动", "🇯🇵 日本手动", "🇸🇬 新加坡手动", "🇺🇸 美国手动", "🇪🇺 欧洲手动", "🌐 其他手动", "DIRECT", "REJECT"]
+  - name: "🍉 下载手动"
+    type: select
+    include-all: true
+    filter: '(?i)0[.][0-9]|倍率|下载|Down|233boy|0xda|fscarmen|suoha|argo'
+
+  # 良心云类
+  - name: "❤️ 良心云"
+    type: select
+    proxies: ["❤️ 良心云手动", "🍉 下载手动", "🚀 一键代理", "🇭🇰 香港手动", "🇯🇵 日本手动", "🇸🇬 新加坡手动", "🇺🇸 美国手动", "🇪🇺 欧洲手动", "🌐 其他手动", "DIRECT", "REJECT"]
+  - name: "❤️ 良心云手动"
+    type: select
+    include-all: true
+    filter: '(?i)BGP|良心|中转|解|NF|Netflix|流媒体'
+
+  # === 3. 地区手动组 ===
+  - name: "🇭🇰 香港手动"
+    type: select
+    include-all: true
+    filter: '(?i)港|HK|Hong ?Kong|HKG'
+
+  - name: "🇯🇵 日本手动"
+    type: select
+    include-all: true
+    filter: '(?i)日|JP|Japan|东京|大阪|埼玉|泉日|川日'
+
+  - name: "🇸🇬 新加坡手动"
+    type: select
+    include-all: true
+    filter: '(?i)新|坡|狮城|SG|Singapore'
+
+  - name: "🇺🇸 美国手动"
+    type: select
+    include-all: true
+    filter: '(?i)美|US|States|America|洛杉矶|圣何塞|西雅图|波特兰|达拉斯'
+
+  - name: "🇪🇺 欧洲手动"
+    type: select
+    include-all: true
+    filter: '(?i)英|法|德|意|荷|瑞|欧|UK|GB|FR|DE|IT|NL|ES|SE|EU|London|Frankfurt|Paris|Amsterdam'
+
+  - name: "🌐 其他手动"
+    type: select
+    include-all: true
+    exclude-filter: '(?i)港|HK|日|JP|新|SG|美|US|英|法|德|意|荷|瑞|欧|EU|IPLC|IEPL|游戏|0[.][0-9]|233boy|0xda|fscarmen|suoha|argo'
+
+  # === 4. 业务分类组（最后） ===
+  - { name: "📹 YouTube", type: select, proxies: [ "🍉 下载手动", "🚀 一键代理", "🇭🇰 香港手动", "🇯🇵 日本手动", "🇸🇬 新加坡手动", "🇺🇸 美国手动", "🇪🇺 欧洲手动", "🎉 自建手动", "DIRECT" ] }
+  - { name: "👨🏿‍💻 GitHub", type: select, proxies: [ "🍉 下载手动", "🚀 一键代理", "🇺🇸 美国手动", "🇪🇺 欧洲手动", "🎉 自建手动", "DIRECT" ] }
+  - { name: "📲 Telegram", type: select, proxies: [ "🍉 下载手动", "🚀 一键代理", "🇸🇬 新加坡手动", "🇭🇰 香港手动", "🇺🇸 美国手动", "🎉 自建手动" ] }
+  - { name: "🎥 NETFLIX", type: select, proxies: [ "🍉 下载手动", "🚀 一键代理", "🇭🇰 香港手动", "🇯🇵 日本手动", "🇺🇸 美国手动", "🎉 自建手动" ] }
+  - { name: "🤖 ChatGPT", type: select, proxies: [ "🚀 一键代理", "🇺🇸 美国手动", "🇯🇵 日本手动", "🇸🇬 新加坡手动", "🇪🇺 欧洲手动", "🌐 其他手动", "🎉 自建手动", "❤️ 良心云手动", "🍉 下载手动" ] }
+  - { name: "🐬 OneDrive", type: select, proxies: [ "DIRECT", "🚀 一键代理", "🎉 自建手动", "🍉 下载手动" ] }
+  - { name: "🪟 Microsoft", type: select, proxies: [ "DIRECT", "🚀 一键代理", "🎉 自建手动", "🍉 下载手动" ] }
+  - { name: "💶 PayPal", type: select, proxies: [ "DIRECT", "🚀 一键代理", "🎉 自建手动", "🍉 下载手动" ] }
+  - { name: "🎵 TikTok", type: select, proxies: [ "🚀 一键代理", "🇸🇬 新加坡手动", "🇯🇵 日本手动", "🇭🇰 香港手动", "🎉 自建手动", "🍉 下载手动" ] }
+  - { name: "✈️ Speedtest", type: select, proxies: [ "🚀 一键代理", "DIRECT" ] }
+  - { name: "🐟 漏网之鱼", type: select, proxies: [ "🚀 一键代理", "DIRECT" ] }
+
+# 规则集 (Rule Providers)
+rule-providers:
+  private_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs", format: mrs, interval: 86400 }
+  category_ads_all: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs", format: mrs, interval: 86400 }
+  speedtest_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/ookla-speedtest.mrs", format: mrs, interval: 86400 }
+  ai: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs", format: mrs, interval: 86400 }
+  github_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs", format: mrs, interval: 86400 }
+  youtube_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs", format: mrs, interval: 86400 }
+  onedrive_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs", format: mrs, interval: 86400 }
+  microsoft_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs", format: mrs, interval: 86400 }
+  tiktok_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs", format: mrs, interval: 86400 }
+  telegram_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs", format: mrs, interval: 86400 }
+  steam_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam.mrs", format: mrs, interval: 86400 }
+  steam_cn_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs", format: mrs, interval: 86400 }
+  netflix_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs", format: mrs, interval: 86400 }
+  paypal_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/paypal.mrs", format: mrs, interval: 86400 }
+  geolocation-!cn: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs", format: mrs, interval: 86400 }
+  cn_domain: { type: http, behavior: domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs", format: mrs, interval: 86400 }
+  private_ip: { type: http, behavior: ipcidr, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs", format: mrs, interval: 86400 }
+  telegram_ip: { type: http, behavior: ipcidr, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs", format: mrs, interval: 86400 }
+  netflix_ip: { type: http, behavior: ipcidr, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs", format: mrs, interval: 86400 }
+  cn_ip: { type: http, behavior: ipcidr, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs", format: mrs, interval: 86400 }
+
+# 路由规则
+rules:
+  - RULE-SET,category_ads_all,REJECT
+  - RULE-SET,private_ip,DIRECT,no-resolve
+  - RULE-SET,private_domain,DIRECT
+  - DOMAIN-SUFFIX,services.googleapis.cn,💡 商店
+  - DOMAIN-KEYWORD,-ni5,💡 商店
+  - DOMAIN-KEYWORD,2x3,💡 商店
+  - DOMAIN-KEYWORD,-j5o,💡 商店
+  - RULE-SET,ai,🤖 ChatGPT
+  - PROCESS-NAME,com.x8bit.bitwarden,DIRECT
+  - DOMAIN,logs.81plug.com,REJECT
+  - DOMAIN-SUFFIX,singular.net,REJECT
+  - DOMAIN-SUFFIX,amplitude.com,REJECT
+  - DOMAIN-SUFFIX,cloudfront.net,DIRECT
+  - DOMAIN-SUFFIX,sginfra.net,DIRECT
+  - DOMAIN-KEYWORD,down.game.playstove.com,🍉 下载
+  - DOMAIN-SUFFIX,game.playstove.com,🛸 游戏
+  - DOMAIN-KEYWORD,api.onstove.com,🛸 游戏
+  - DOMAIN-SUFFIX,sentry.onstove.com,🛸 游戏
+  - DOMAIN-SUFFIX,mgs.smilegate.com,🛸 游戏
+  - DOMAIN-SUFFIX,mgs-t.playstove.com,🛸 游戏
+  - DOMAIN-SUFFIX,static.smilegatemegaport.com,🛸 游戏
+  - DOMAIN-SUFFIX,nodeseek.com,❤️ 良心云
+  - PROCESS-NAME,tech.lolli.toolbox,❤️ 良心云
+  - PROCESS-NAME,com.termux,🍉 下载
+  - PROCESS-NAME,gamehub.lite,🍉 下载
+  - PROCESS-NAME,com.antutu.benchmark.full,🍉 下载
+  - PROCESS-NAME,dev.imranr.obtainium.fdroid,🍉 下载
+  - PROCESS-NAME,de.marmaro.krt.ffupdater,🍉 下载
+  - PROCESS-NAME,com.apkupdater.ci,🍉 下载
+  - PROCESS-NAME,com.aurora.store,🍉 下载
+  - PROCESS-NAME,com.perol.pixez,🍉 下载
+  - PROCESS-NAME,com.looker.droidify,🍉 下载
+  - PROCESS-NAME,org.fdroid.basic,🍉 下载
+  - PROCESS-NAME,com.abdownloadmanager,🍉 下载
+  - PROCESS-NAME,com.neowizgames.game.browndust2,🛸 游戏
+  - PROCESS-NAME,com.google.android.gsf,🛸 游戏
+  - PROCESS-NAME,com.google.android.gms,🛸 游戏
+  - PROCESS-NAME,com.android.vending,🛸 游戏
+  - PROCESS-NAME,moe.nb4a,🛸 游戏
+  - PROCESS-NAME,com.brave.browser,🛸 游戏
+  - PROCESS-NAME,com.android.chrome,🛸 游戏
+  - PROCESS-NAME,com.browser.app,❤️ 良心云
+  - PROCESS-NAME,com.fsck.k9,❤️ 良心云
+  - PROCESS-NAME,org.mozilla.fennec_fdroid,❤️ 良心云
+  - RULE-SET,steam_cn_domain,DIRECT
+  - RULE-SET,steam_domain,🍉 下载
+  - RULE-SET,telegram_domain,📲 Telegram
+  - RULE-SET,telegram_ip,📲 Telegram,no-resolve
+  - RULE-SET,netflix_domain,🎥 NETFLIX
+  - RULE-SET,netflix_ip,🎥 NETFLIX,no-resolve
+  - RULE-SET,youtube_domain,📹 YouTube
+  - RULE-SET,github_domain,👨🏿‍💻 GitHub
+  - RULE-SET,onedrive_domain,🐬 OneDrive
+  - RULE-SET,microsoft_domain,🪟 Microsoft
+  - RULE-SET,paypal_domain,💶 PayPal
+  - RULE-SET,tiktok_domain,🎵 TikTok
+  - RULE-SET,speedtest_domain,✈️ Speedtest
+  - RULE-SET,geolocation-!cn,🚀 一键代理
+  - RULE-SET,cn_domain,DIRECT
+  - RULE-SET,cn_ip,DIRECT
+  - MATCH,🐟 漏网之鱼
